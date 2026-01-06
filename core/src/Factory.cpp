@@ -2,6 +2,7 @@
 #include "mixr/simulation/factory.hpp"
 #include "mixr/base/IObject.hpp"
 
+#include "core/CrfsSimulation.h"
 #include "core/EmissionManager.h"
 #include "core/EmitterSettingsManager.h"
 #include "core/NetPacketGenerator.h"
@@ -19,6 +20,7 @@ namespace mixr {
 		{
 			base::IObject* obj{};
 
+            if (name == CrfsSimulation::getFactoryName()) { obj = new CrfsSimulation(); }
 			if (name == EmissionManager::getFactoryName() )   { obj = new EmissionManager(); }
 			if (name == EmitterSettingsManager::getFactoryName()) { obj = new EmitterSettingsManager(); }
 			if (name == NetPacketGenerator::getFactoryName()) { obj = new NetPacketGenerator(); }
