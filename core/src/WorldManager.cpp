@@ -1,5 +1,7 @@
 #include "core/WorldManager.h"
 
+//moves and articulates players to establish the 'single truth' of the RF state
+
 namespace mixr {
 	namespace crfs {
 		IMPLEMENT_SUBCLASS(WorldManager, "WorldManager")

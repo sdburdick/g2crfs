@@ -26,6 +26,7 @@ namespace mixr {
 			if (name == NetPacketGenerator::getFactoryName()) { obj = new NetPacketGenerator(); }
 			if (name == Propegator::getFactoryName()) { obj = new Propegator(); }
 			if (name == ReflectionManager::getFactoryName()) { obj = new ReflectionManager();  }
+            if (name == RemoteHandler::getFactoryName()) { obj = new RemoteHandler(); }
 			if (name == WorldManager::getFactoryName()) { obj = new WorldManager(); }
 			return obj;
 		}

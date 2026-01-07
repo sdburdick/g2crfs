@@ -20,6 +20,7 @@
 #include "mixr/graphics/factory.hpp"
 
 #include "core/Factory.h"
+#include "remote/Factory.h"
 
 #include <string>
 #include <cstdlib>
@@ -121,6 +122,7 @@ using FactoryFunc = mixr::base::IObject* (*)(const std::string&);
 
 FactoryFunc factories[] = {//array of IObject returning factory pointers
     mixr::crfs::crfsFactory,
+    mixr::crfs::remoteFactory,
     //mixr::crfs::crfsGuiFactory,
     mixr::simulation::factory,
     mixr::models::factory,

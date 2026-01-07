@@ -1,5 +1,7 @@
 #include "core/ReflectionManager.h"
 
+//reads off the input vector files to build out a reflection scheme for emissions when they contact a surface
+
 namespace mixr {
 	namespace crfs {
 		IMPLEMENT_SUBCLASS(ReflectionManager, "ReflectionManager")

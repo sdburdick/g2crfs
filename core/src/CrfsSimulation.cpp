@@ -21,7 +21,7 @@ namespace mixr {
             BaseClass::copyData(org);
 
             // 2. Copy local
-            // this->myVariable = org.myVariable;
+            // this->myVariable = org.myVariable;   
         }
         void CrfsSimulation::deleteData() {
             BaseClass::deleteData();

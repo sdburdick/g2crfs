@@ -1,5 +1,9 @@
 #include "core/RemoteHandler.h"
 
+
+//builds and sends the CRFS Packet for Receivers, or CPR.  Determines what energy stimulated each definied receiver -
+//what power, what frequency, what angle, and what time of arrival
+
 namespace mixr {
 	namespace crfs {
 		IMPLEMENT_SUBCLASS(RemoteHandler, "RemoteHandler")
@@ -30,6 +34,7 @@ namespace mixr {
 		void RemoteHandler::updateData(const double dt) {
 			// Update internal state
 			BaseClass::updateData(dt);
+            
 		}
 
 

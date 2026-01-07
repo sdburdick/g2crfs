@@ -1,5 +1,8 @@
 #include "core/EmitterSettingsManager.h"
 
+//receives packets from emitters that come online.  this allows remote entities to control high fidelity operational settings
+//does file i/o to read complex emitter settings
+
 namespace mixr {
 	namespace crfs {
 		IMPLEMENT_SUBCLASS(EmitterSettingsManager, "EmitterSettingsManager")

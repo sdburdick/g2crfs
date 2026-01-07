@@ -1,15 +1,14 @@
 #pragma once
 
 #include <mixr/base/IComponent.hpp>
-#include "shared/asio-1.36.0/asio.hpp"
 
 namespace mixr {
 	namespace crfs {
-		class RemoteHandler final : public mixr::base::IComponent {
-			DECLARE_SUBCLASS(RemoteHandler, mixr::base::IComponent)
+		class EmitterSettings final : public mixr::base::IComponent {
+			DECLARE_SUBCLASS(EmitterSettings, mixr::base::IComponent)
 
 		public:
-            RemoteHandler();
+            EmitterSettings();
 
 			void updateTC(const double dt) override;
 			void updateData(const double dt)override;
@@ -17,8 +16,6 @@ namespace mixr {
 
 		private:
 			bool initialized{};
-            asio::io_context io;
-            
 		};
 	}
 }

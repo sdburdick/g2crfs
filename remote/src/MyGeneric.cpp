@@ -1,41 +1,45 @@
-#include "core/EmissionManager.h"
-
-//generates emissions based on emitters that are declared in the system
+#include "remote/MyGeneric.h"
 
 namespace mixr {
 	namespace crfs {
-		IMPLEMENT_SUBCLASS(EmissionManager, "EmissionManager")
-		EMPTY_SLOTTABLE(EmissionManager)
-		//EMPTY_SERIALIZER(EmissionManager)
+		IMPLEMENT_SUBCLASS(MyGeneric, "MyGeneric")
+		EMPTY_SLOTTABLE(MyGeneric)
+		//EMPTY_SERIALIZER(MyGeneric)
 
-        EmissionManager::EmissionManager() {
+		MyGeneric::MyGeneric() {
 			STANDARD_CONSTRUCTOR()
 		}
-
-        void EmissionManager::copyData(const EmissionManager& org, const bool cc)
+        void MyGeneric::copyData(const MyGeneric& org, const bool cc)
         {
-            BaseClass::copyData(org, cc);
             if (cc) {
                 //Resource Allocation : The object knows it must allocate fresh memory for any internal components rather than just pointing to org memory.
             }
             else {
                 //need to delete existing pointers to prevent memory leaks
             }
+            // 1. Call the base class copyData first!
+            BaseClass::copyData(org);
+
+            // 2. Copy local
             // this->myVariable = org.myVariable;
         }
-        void EmissionManager::deleteData() {
+        void MyGeneric::deleteData() {
             BaseClass::deleteData();
         }
-		void EmissionManager::reset() {
+
+		void MyGeneric::reset() {
 			BaseClass::reset();
 		}
 
-		void EmissionManager::updateData(const double dt) {
+
+		void MyGeneric::updateData(const double dt) {
 			// Update internal state
 			BaseClass::updateData(dt);
 		}
 
-		void EmissionManager::updateTC(const double dt) {
+
+		void MyGeneric::updateTC(const double dt) {
+			
 			BaseClass::updateTC(dt);
 		}
 	}
