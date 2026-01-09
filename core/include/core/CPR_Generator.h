@@ -37,10 +37,7 @@ namespace mixr {
 		private:
 
             asio::io_context io_context;
-            float compute_value_for(const Client& c) {
-                // Example: client-specific data
-                return static_cast<float>(seq_) * 0.01f;
-            }
+            float compute_value_for(const Client& c);
 
             void runNetworkThread();
             

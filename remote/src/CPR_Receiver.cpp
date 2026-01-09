@@ -53,30 +53,16 @@ namespace mixr {
 
 		void CPR_Receiver::reset() {
 			BaseClass::reset();
-            
-                
-		}
-
-
-        void CPR_Receiver::updateData(const double dt) {
-            // Update internal state
-            BaseClass::updateData(dt);
-            //io_context.run();
-
-            
-            
-
-
             //workerThread is saved in the class, need to spawn off a lambda function to run it.  It will take control of the socket we are using, so move the unique pointer
             if (workerThread && workerThread->joinable()) {
-                
+
             }
             else {
                 workerThread = std::make_unique<std::thread>([this, socket_ptr = std::shared_ptr<udp::socket>(std::move(udp_socket))]() {
 #ifdef _WIN32
                     SetThreadDescription(GetCurrentThread(), L"CPR_Receiver");
 #endif
-                    
+
                     auto last_time = std::chrono::steady_clock::now();
                     while (keep_running) {
                         try {
@@ -94,9 +80,9 @@ namespace mixr {
 
                             if (len == sizeof(CPR_Packet)) {
                                 message_count++;
-                              //  std::cout << "Received Seq: " << incoming_packet.seq
-                                //    << " | TS: " << incoming_packet.timestamp_ns
-                                  //  << " | Val: " << incoming_packet.value << std::endl;
+                                //  std::cout << "Received Seq: " << incoming_packet.seq
+                                  //    << " | TS: " << incoming_packet.timestamp_ns
+                                    //  << " | Val: " << incoming_packet.value << std::endl;
                             }
                             else {
                                 std::cerr << "Received packet of unexpected size: " << len << " bytes" << std::endl;
@@ -108,6 +94,16 @@ namespace mixr {
                     }
                     });//closes thread running lambda
             }
+            
+                
+		}
+
+
+        void CPR_Receiver::updateData(const double dt) {
+            // Update internal state
+            BaseClass::updateData(dt);
+
+            
 		}
 
 

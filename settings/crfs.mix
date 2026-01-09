@@ -17,7 +17,7 @@
    //"startupResetTimer",  // 16: Startup (initial) RESET event timer value (base::Time) (default: no reset event)
    //"enableUpdateTimers", // 17: Enable calling base::Timers::updateTimers() from updateTC() (default: false)
    //"dataRecorder",       // 18) Our Data Recorder
-	tcRate: 200
+	tcRate: 10000
 	bgRate: 20 //Hz
     simulation: (CrfsSimulation
 		players: { 
@@ -26,6 +26,7 @@
 		components: {
 			(CPR_Generator)
 			(CPR_Receiver)
+			
 		}
 	)
 )

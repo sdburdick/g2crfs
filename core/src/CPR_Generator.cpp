@@ -52,6 +52,10 @@ namespace mixr {
             io_context.run();
         }
 
+        float CPR_Generator::compute_value_for(const Client& c) {
+            // Example: client-specific data
+            return static_cast<float>(seq_) * 0.01f;
+        }
 
         void CPR_Generator::tick() {
             const uint64_t now_ns =
