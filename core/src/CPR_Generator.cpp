@@ -13,7 +13,9 @@ namespace mixr {
         CPR_Generator::CPR_Generator() : io_context(){
               
             STANDARD_CONSTRUCTOR()
-            socket_ptr = std::make_unique<asio::ip::udp::socket>(io_context);
+            
+            udp_endpoint = std::make_shared<asio::ip::udp::endpoint>(asio::ip::make_address(interface_ip), udp_port);
+            socket_ptr = std::make_unique<asio::ip::udp::socket>(io_context, *udp_endpoint);
             udpThread = std::move(std::make_unique<std::thread>(std::thread(&CPR_Generator::runNetworkThread, this)));
 		}
         void CPR_Generator::copyData(const CPR_Generator& org, const bool cc)
@@ -35,10 +37,18 @@ namespace mixr {
         }
 		void CPR_Generator::reset() {
 			BaseClass::reset();
+            //this would have to be coordinated with the subscriber
+            add_client(udp::endpoint(asio::ip::make_address("127.0.0.1"), 5001));
 		}
 
-       
+        void CPR_Generator::add_client(const udp::endpoint& ep) {
+            Client c{};
+            c.endpoint = ep;
+            clients_.push_back(c);
+        }
+        
         void CPR_Generator::runNetworkThread() {
+            SetThreadDescription(GetCurrentThread(), L"CPR_Generator IO Context");
             io_context.run();
         }
 
@@ -53,6 +63,7 @@ namespace mixr {
                 c.packet.seq = seq_;
                 c.packet.timestamp_ns = now_ns;
                 c.packet.value = compute_value_for(c);
+
 
                 socket_ptr->async_send_to(
                     asio::buffer(&c.packet, sizeof(CPR_Packet)),

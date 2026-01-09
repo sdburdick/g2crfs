@@ -46,6 +46,11 @@ namespace mixr {
             
             std::unique_ptr <std::thread> udpThread;
             
+            std::shared_ptr<asio::ip::udp::endpoint> udp_endpoint;
+
+            std::string interface_ip = "127.0.0.1";
+            unsigned short udp_port = 5000;
+
             std::unique_ptr <udp::socket> socket_ptr;
             std::vector<Client> clients_;
             uint32_t seq_;

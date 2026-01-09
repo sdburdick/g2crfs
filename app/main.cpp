@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
     //create a background loop within station
     station->createBackgroundProcess();
     //create the net thread
-    station->createNetworkProcess();
+    //station->createNetworkProcess();
 
 	// system Time of Day
 	double simTime{};                                        // Simulator time reference

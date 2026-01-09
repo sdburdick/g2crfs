@@ -5,15 +5,15 @@
 
 #include "shared/asio-1.36.0/asio.hpp"
 
-using asio::ip::tcp;
+using asio::ip::udp;
 
 namespace mixr {
 	namespace crfs {
-		class EmitterSettings final : public mixr::base::IComponent {
-			DECLARE_SUBCLASS(EmitterSettings, mixr::base::IComponent)
+		class CPR_Receiver final : public mixr::base::IComponent {
+			DECLARE_SUBCLASS(CPR_Receiver, mixr::base::IComponent)
 
 		public:
-            EmitterSettings();
+            CPR_Receiver();
 
 			void updateTC(const double dt) override;
 			void updateData(const double dt)override;
@@ -27,11 +27,18 @@ namespace mixr {
             
             asio::io_context io_context;
             //must use unique pointer because Mixr factory instantiates,
-            //leaving tcp_socket uninstantiated
-            std::unique_ptr<asio::ip::tcp::socket> tcp_socket;
+            //leaving udp_socket uninstantiated
+            std::shared_ptr<asio::ip::udp::endpoint> udp_endpoint;
+            std::unique_ptr<asio::ip::udp::socket> udp_socket;
 
-            const std::string tcp_host = "127.0.0.1";
-            const std::string tcp_port = "3000";
+            std::string interface_ip = "127.0.0.1";
+            unsigned short udp_port = 5001;
+
+            std::unique_ptr<std::thread> workerThread;
+            std::unique_ptr<std::thread> monitor_thread;
+            
+            bool keep_running{ true };
+            std::atomic<uint32_t> message_count{ 0 };
 		};
 	}
 }
