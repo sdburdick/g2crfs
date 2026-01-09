@@ -1,6 +1,8 @@
 #pragma once
 
 #include <mixr/base/IComponent.hpp>
+#include "CRFS_Packet_for_Receivers.h"
+
 #include "shared/asio-1.36.0/asio.hpp"
 
 using asio::ip::tcp;

@@ -23,5 +23,8 @@
 		players: { 
 			remote1: (RemotePlayer)
 		}
+		components: {
+			(CPR_Generator)
+		}
 	)
 )

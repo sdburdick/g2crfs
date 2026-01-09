@@ -8,6 +8,8 @@
 #include "mixr/base/units/angles.hpp"
 #include "mixr/base/util/system_utils.hpp"
 
+#include "CRFS_Packet_for_Receivers.h"
+
 #include "mixr/graphics/display.hpp"
 // factories
 #include "shared/xzmq/factory.hpp" //this one is here just to show how to get to the shared area
@@ -286,6 +288,7 @@ int main(int argc, char* argv[])
 	//}
 	//std::cout << "ready to close\n";
 
+    while (1) {}
     std::cout << "no loop no gui, we're done here because we never had anything to do\n";
    return 0;
 }
