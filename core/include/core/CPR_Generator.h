@@ -46,7 +46,8 @@ namespace mixr {
             std::shared_ptr<asio::ip::udp::endpoint> udp_endpoint;
 
             std::string interface_ip = "127.0.0.1";
-            unsigned short udp_port = 5000;
+            //std::string interface_ip = "192.168.4.47"; //outgoing IP interface on this computer.  Needs to be able to connect to the net you are transmitting to
+            unsigned short udp_port = 5100; //outgoing port on this computer.  does not match the connected clients, just needs to be free and usable
 
             std::unique_ptr <udp::socket> socket_ptr;
             std::vector<Client> clients_;

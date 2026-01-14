@@ -6,6 +6,8 @@
 #include "shared/asio-1.36.0/asio.hpp"
 
 using asio::ip::udp;
+using mixr::base::String;
+using mixr::base::Integer;
 
 namespace mixr {
 	namespace crfs {
@@ -20,6 +22,9 @@ namespace mixr {
 			void reset() override;
 
 
+        protected:
+            bool setSlotInterfaceIpString(const mixr::base::String* const name);
+            bool setSlotInterfaceListenPort(const mixr::base::Integer* const port);
 
 		private:
 			bool initialized{};
@@ -31,8 +36,10 @@ namespace mixr {
             std::shared_ptr<asio::ip::udp::endpoint> udp_endpoint;
             std::unique_ptr<asio::ip::udp::socket> udp_socket;
 
+
             std::string interface_ip = "127.0.0.1";
-            unsigned short udp_port = 5001;
+            //std::string interface_ip = "192.168.4.50"; 
+            unsigned short udp_port = 5001; 
 
             std::unique_ptr<std::thread> workerThread;
             std::unique_ptr<std::thread> monitor_thread;

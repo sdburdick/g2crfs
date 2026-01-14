@@ -1,9 +1,28 @@
 #include "remote/CPR_Receiver.h"
+#include "mixr/base/String.hpp"
+#include "mixr/base/numeric/Integer.hpp"
 
 namespace mixr {
 	namespace crfs {
 		IMPLEMENT_SUBCLASS(CPR_Receiver, "CPR_Receiver")
-		EMPTY_SLOTTABLE(CPR_Receiver)
+            BEGIN_SLOTTABLE(CPR_Receiver)
+                "interfaceIpString",  //this is the ip of the local interface on the "remote computer" which is 'this' computer that you are running on
+                "interfaceListenPort" //this is the port you are listening on, and needs to match the endpoint code on the generator
+            END_SLOTTABLE(CPR_Receiver)
+
+        BEGIN_SLOT_MAP(CPR_Receiver)
+            ON_SLOT(1, setSlotInterfaceIpString, mixr::base::String)
+            ON_SLOT(2, setSlotInterfaceListenPort, mixr::base::Integer)
+        END_SLOT_MAP()
+
+        bool CPR_Receiver::setSlotInterfaceIpString(const mixr::base::String* const name) {
+            interface_ip = name->c_str();
+            return true;
+        }
+        bool CPR_Receiver::setSlotInterfaceListenPort(const mixr::base::Integer* const port) {
+            udp_port = port->asInt();
+            return true;
+        }
 		//EMPTY_SERIALIZER(CPR_Receiver)
 
         CPR_Receiver::CPR_Receiver() : io_context(){

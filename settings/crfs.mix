@@ -25,7 +25,9 @@
 		}
 		components: {
 			(CPR_Generator)
-			(CPR_Receiver)
+			(CPR_Receiver
+			interfaceIpString: "127.0.0.1"
+			)
 			
 		}
 	)

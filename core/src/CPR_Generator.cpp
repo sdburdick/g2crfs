@@ -38,6 +38,7 @@ namespace mixr {
 		void CPR_Generator::reset() {
 			BaseClass::reset();
             //this would have to be coordinated with the subscriber
+            //add_client(udp::endpoint(asio::ip::make_address("192.168.4.50"), 5001));
             add_client(udp::endpoint(asio::ip::make_address("127.0.0.1"), 5001));
 		}
 
@@ -55,7 +56,7 @@ namespace mixr {
             using namespace std::chrono;
 
             // 100 Hz = 10 millisecond interval
-            const nanoseconds interval(10'000);
+            const nanoseconds interval(1'000'000); //1,000,000 translates to 1,000 Hz.  10 mil would be 100 Hz
             auto next_tick = steady_clock::now() + interval;
 
             while (true) {
