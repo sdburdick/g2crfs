@@ -14,11 +14,13 @@ namespace mixr {
             
             udp_socket = std::make_unique<asio::ip::udp::socket>(io_context, *udp_endpoint);
 
+            //purely optional here - monitoring the number of messages received on a separate thread
             monitor_thread = std::make_unique<std::thread>([&]() {
 #ifdef _WIN32
                 SetThreadDescription(GetCurrentThread(), L"UDP_Monitor_Thread");
 #endif
-
+                //this isn't precise, it will sleep for a second and grab the number, while the other thread is off and running
+                //so don't expect exact Hz reporting
                 while (keep_running) {
                     // Wait for 1 second
                     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -58,18 +60,27 @@ namespace mixr {
 
             }
             else {
+                //placed in the reset call, this is where a thread is kicked off and 
+                //listens for packets on UDP.
+                //this is blocking so it's all contained within this thread, within the lambda
                 workerThread = std::make_unique<std::thread>([this, socket_ptr = std::shared_ptr<udp::socket>(std::move(udp_socket))]() {
 #ifdef _WIN32
+                    //thread name identified for windows for easier debugging.  not necessary long term
                     SetThreadDescription(GetCurrentThread(), L"CPR_Receiver");
 #endif
 
                     auto last_time = std::chrono::steady_clock::now();
+                    CPR_Packet incoming_packet;
+
+                    incoming_packet.seq = 0;
+                    incoming_packet.timestamp_ns = 0;
+                    
+                    std::fill(&incoming_packet.freqbinByTimeslicePower[0][0],
+                        &incoming_packet.freqbinByTimeslicePower[0][0] + (FREQ_BINS * TIMESLICES), 0);
+                    
                     while (keep_running) {
                         try {
-                            CPR_Packet incoming_packet;
-                            incoming_packet.seq = 0;
-                            incoming_packet.timestamp_ns = 0;
-                            incoming_packet.value = 0;
+                            
 
                             udp::endpoint remote_endpoint;
 
@@ -78,8 +89,10 @@ namespace mixr {
                                 remote_endpoint
                             );
 
+
                             if (len == sizeof(CPR_Packet)) {
                                 message_count++;
+                                //std::cout << "incoming packet: " << incoming_packet.freqbinByTimeslicePower[3][4] << std::endl;
                                 //  std::cout << "Received Seq: " << incoming_packet.seq
                                   //    << " | TS: " << incoming_packet.timestamp_ns
                                     //  << " | Val: " << incoming_packet.value << std::endl;

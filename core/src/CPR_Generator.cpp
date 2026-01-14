@@ -41,6 +41,8 @@ namespace mixr {
             add_client(udp::endpoint(asio::ip::make_address("127.0.0.1"), 5001));
 		}
 
+
+        //this function needs to be tied to entities subscribing.
         void CPR_Generator::add_client(const udp::endpoint& ep) {
             Client c{};
             c.endpoint = ep;
@@ -49,7 +51,24 @@ namespace mixr {
         
         void CPR_Generator::runNetworkThread() {
             SetThreadDescription(GetCurrentThread(), L"CPR_Generator IO Context");
-            io_context.run();
+            //we want an asynchronous send - we want to process as many CPR messages as possible
+            using namespace std::chrono;
+
+            // 100 Hz = 10 millisecond interval
+            const nanoseconds interval(10'000);
+            auto next_tick = steady_clock::now() + interval;
+
+            while (true) {
+                // 1. Perform your networking work
+                tick();
+
+                // 2. Wait until exactly the next 10ms boundary
+                std::this_thread::sleep_until(next_tick);
+
+                // 3. Increment the goalpost by exactly 10ms
+                next_tick += interval;
+            }
+            
         }
 
         float CPR_Generator::compute_value_for(const Client& c) {
@@ -58,17 +77,31 @@ namespace mixr {
         }
 
         void CPR_Generator::tick() {
+
+            //timer for the rate of messages we want to send out:
             const uint64_t now_ns =
                 duration_cast<std::chrono::nanoseconds>(
                     std::chrono::steady_clock::now().time_since_epoch()
                 ).count();
             
             for (auto& c : clients_) {
+
                 c.packet.seq = seq_;
                 c.packet.timestamp_ns = now_ns;
-                c.packet.value = compute_value_for(c);
+                c.packet.freqbinByTimeslicePower[3][4] = compute_value_for(c);
 
 
+                //blasting out a warning if our packet exceed OS packet size
+                asio::socket_base::send_buffer_size option;
+                socket_ptr->get_option(option);
+
+                size_t system_max_send = option.value();
+
+                if (sizeof(CPR_Packet) > system_max_send) {
+                    std::cerr << "Packet exceeds OS send buffer size." << std::endl;
+                }
+
+                
                 socket_ptr->async_send_to(
                     asio::buffer(&c.packet, sizeof(CPR_Packet)),
                     c.endpoint,
@@ -77,7 +110,6 @@ namespace mixr {
                     }
                 );
             }
-
             ++seq_;
         }
 
@@ -86,9 +118,8 @@ namespace mixr {
 			BaseClass::updateData(dt);
 		}
 
-
 		void CPR_Generator::updateTC(const double dt) {
-            tick();
+            //tick();
 			BaseClass::updateTC(dt);
 		}
 	}

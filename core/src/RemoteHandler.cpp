@@ -43,7 +43,7 @@ namespace mixr {
             startAccept(); // Set up the first async accept
             while (keep_running) {
                 try {
-                    io_context.run(); // Process all async events
+                    //io_context.run(); // Process all async events
                 }
                 catch (std::exception& e) {
                     std::cerr << "Asio Thread Error: " << e.what() << std::endl;
