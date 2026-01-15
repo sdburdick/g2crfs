@@ -5,10 +5,10 @@
 namespace mixr {
 	namespace crfs {
 		IMPLEMENT_SUBCLASS(CPR_Receiver, "CPR_Receiver")
-            BEGIN_SLOTTABLE(CPR_Receiver)
+        BEGIN_SLOTTABLE(CPR_Receiver)
                 "interfaceIpString",  //this is the ip of the local interface on the "remote computer" which is 'this' computer that you are running on
                 "interfaceListenPort" //this is the port you are listening on, and needs to match the endpoint code on the generator
-            END_SLOTTABLE(CPR_Receiver)
+        END_SLOTTABLE(CPR_Receiver)
 
         BEGIN_SLOT_MAP(CPR_Receiver)
             ON_SLOT(1, setSlotInterfaceIpString, mixr::base::String)
@@ -21,6 +21,7 @@ namespace mixr {
         }
         bool CPR_Receiver::setSlotInterfaceListenPort(const mixr::base::Integer* const port) {
             udp_port = port->asInt();
+            
             return true;
         }
 		//EMPTY_SERIALIZER(CPR_Receiver)
@@ -29,10 +30,7 @@ namespace mixr {
 			STANDARD_CONSTRUCTOR()
             
                 
-            udp_endpoint = std::make_shared<asio::ip::udp::endpoint> (asio::ip::make_address(interface_ip), udp_port);
             
-            udp_socket = std::make_unique<asio::ip::udp::socket>(io_context, *udp_endpoint);
-
             //purely optional here - monitoring the number of messages received on a separate thread
             monitor_thread = std::make_unique<std::thread>([&]() {
 #ifdef _WIN32
@@ -74,6 +72,10 @@ namespace mixr {
 
 		void CPR_Receiver::reset() {
 			BaseClass::reset();
+            udp_endpoint = std::make_shared<asio::ip::udp::endpoint>(asio::ip::make_address(interface_ip), udp_port);
+            udp_socket = std::make_unique<asio::ip::udp::socket>(io_context, *udp_endpoint);
+
+
             //workerThread is saved in the class, need to spawn off a lambda function to run it.  It will take control of the socket we are using, so move the unique pointer
             if (workerThread && workerThread->joinable()) {
 

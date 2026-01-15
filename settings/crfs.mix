@@ -24,9 +24,20 @@
 			remote1: (RemotePlayer)
 		}
 		components: {
-			(CPR_Generator)
+			(CPR_Generator
+				interfaceIpString: "127.0.0.1"
+				interfaceHostOutgoingPort: 5500
+				clients: { 
+					{"127.0.0.1", 5000},
+					{"127.0.0.2", 5001},
+					{"10.0.0.5",  6000},
+					
+					{"127.0.0.1", 5002}
+				}
+			)
 			(CPR_Receiver
-			interfaceIpString: "127.0.0.1"
+				interfaceIpString: "127.0.0.1"
+				interfaceListenPort: 5002
 			)
 			
 		}

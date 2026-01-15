@@ -1,4 +1,7 @@
 #include "core/CPR_Generator.h"
+#include "mixr/base/String.hpp"
+#include "mixr/base/numeric/Integer.hpp"
+#include "mixr/base/PairStream.hpp"
 
 
 //builds and sends the CRFS Packet for Receivers, or CPR.  Determines what energy stimulated each definied receiver -
@@ -7,8 +10,96 @@
 namespace mixr {
     namespace crfs {
         IMPLEMENT_SUBCLASS(CPR_Generator, "CPR_Generator") 
-        EMPTY_SLOTTABLE(CPR_Generator)
+ 
         //EMPTY_SERIALIZER(CPR_Generator)
+        BEGIN_SLOTTABLE(CPR_Generator)
+            "interfaceIpString",  //outgoing IP interface on this computer.  Needs to be able to connect to the net you are transmitting to
+            "interfaceHostOutgoingPort", //outgoing port on this computer.  does not match the connected clients, just needs to be free and usable
+            "clients"
+        END_SLOTTABLE(CPR_Generator)
+
+        BEGIN_SLOT_MAP(CPR_Generator)
+            ON_SLOT(1, setSlotInterfaceIpString, mixr::base::String)
+            ON_SLOT(2, setSlotInterfaceHostOutgoingPort, mixr::base::Integer)
+            ON_SLOT(3, setClients, mixr::base::PairStream)
+
+        END_SLOT_MAP()
+
+        bool CPR_Generator::setSlotInterfaceIpString(const mixr::base::String* const name) {
+            interface_ip = name->c_str();
+            return true;
+        }
+        bool CPR_Generator::setSlotInterfaceHostOutgoingPort(const mixr::base::Integer* const port) {
+            udp_port = port->asInt();
+            return true;
+        }
+        bool CPR_Generator::setClients(const mixr::base::PairStream* const inputfile_clients)
+        {
+            if (!inputfile_clients) return false;
+
+            clients_.clear();
+
+            //pair stream of connecting clients.  
+            //get the first item
+
+            const mixr::base::IList::Item* clientList = (inputfile_clients->getFirstItem());
+            while (clientList != nullptr) {
+                const mixr::base::Pair* ipPair = dynamic_cast<const mixr::base::Pair*>(clientList->getValue());
+                if (!ipPair) {
+                    std::cerr << "No ipPair in CPR_Generator\n"; 
+                    break;
+                }
+
+                const mixr::base::PairStream* ps = dynamic_cast<const mixr::base::PairStream*>(ipPair->object());
+                if (!ps) {
+                    std::cerr << "No ps in CPR_Generator\n";
+                    break;
+                }
+
+                const mixr::base::IList::Item* ipItem = ps->getFirstItem();
+                if (!ipItem) {
+                    std::cerr << "No ipItem in CPR_Generator\n";
+                    break;
+                }
+
+                const mixr::base::Pair* ipAddressPair = dynamic_cast<const mixr::base::Pair*>(ipItem->getValue());
+                if (!ipAddressPair) {
+                    std::cerr << "No ipAddressPair in CPR_Generator\n";
+                    break;
+                }
+
+                const auto* ipStr = dynamic_cast<const mixr::base::String*>(ipAddressPair->object());
+                if (!ipStr) {
+                    std::cerr << "Expected IP string\n";
+                    return false;
+                }
+                std::string ip = ipStr->c_str();
+
+                ipItem = ipItem->getNext();
+                if (!ipItem) {
+                    std::cerr << "No ipItem2 in CPR_Generator\n";
+                    break;
+                }
+
+                const mixr::base::Pair* portObjPair = dynamic_cast<const mixr::base::Pair*>(ipItem->getValue());
+                if (!portObjPair) {
+                    std::cerr << "No portObjPair in CPR_Generator\n";
+                    break;
+                }
+
+                const auto* portObj = dynamic_cast<const mixr::base::INumber*>(portObjPair->object());
+                if (!portObj) {
+                    std::cerr << "Expected port number\n";
+                    return false;
+                }
+                int port = portObj->asInt();
+
+                add_client(udp::endpoint(asio::ip::make_address(ip), port));
+                clientList = clientList->getNext();
+            }
+
+            return true;
+        }
 
         CPR_Generator::CPR_Generator() : io_context(){
               
@@ -38,8 +129,8 @@ namespace mixr {
 		void CPR_Generator::reset() {
 			BaseClass::reset();
             //this would have to be coordinated with the subscriber
-            //add_client(udp::endpoint(asio::ip::make_address("192.168.4.50"), 5001));
-            add_client(udp::endpoint(asio::ip::make_address("127.0.0.1"), 5001));
+            //add_client(udp::endpoint(asio::ip::make_address("127.0.0.1"), 5001));
+            
 		}
 
 
