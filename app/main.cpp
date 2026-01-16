@@ -9,6 +9,7 @@
 #include "mixr/base/util/system_utils.hpp"
 
 #include "CRFS_Packet_for_Receivers.h"
+#include "gui/SdlVisual.h"
 
 #include "mixr/graphics/display.hpp"
 // factories
@@ -23,6 +24,7 @@
 
 #include "core/Factory.h"
 #include "remote/Factory.h"
+#include "gui/Factory.h"
 
 #include <string>
 #include <cstdlib>
@@ -125,7 +127,7 @@ using FactoryFunc = mixr::base::IObject* (*)(const std::string&);
 FactoryFunc factories[] = {//array of IObject returning factory pointers
     mixr::crfs::crfsFactory,
     mixr::crfs::remoteFactory,
-    //mixr::crfs::crfsGuiFactory,
+    mixr::crfs::crfsGuiFactory,
     mixr::simulation::factory,
     mixr::models::factory,
     mixr::terrain::factory,
@@ -223,10 +225,10 @@ int main(int argc, char* argv[])
     //this whole section should be moved into a file specifically for GUIs
     //todo
 
-    //auto mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>(station);
-    //mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>(0);
-    //mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>();
-    //auto myInputDisplay = station->findComponent<mixr::graphics::Display>(station);
+    auto mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>(station);
+    mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>(0);
+    mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>();
+    auto myInputDisplay = station->findComponent<mixr::graphics::Display>(station);
     
     // create time critical thread
 	station->createTimeCriticalProcess();
@@ -235,60 +237,59 @@ int main(int argc, char* argv[])
     //create a background loop within station
     station->createBackgroundProcess();
     //create the net thread
-    //station->createNetworkProcess();
+    station->createNetworkProcess();
 
 	// system Time of Day
 	double simTime{};                                        // Simulator time reference
 	const double startTime{ mixr::base::getComputerTime() };   // Time of day (sec) run started
 
-	//std::cout << "Main.cpp : starting the GUI part of CRFS gui\n" << std::endl;
+	std::cout << "Main.cpp : starting the GUI\n" << std::endl;
 
 	
 	//initialize all the GL stuff:
 	   //we are using SDL2 as the interface to GL
-	//auto sdlInit = SDL_Init(SDL_INIT_VIDEO);
-	//if (sdlInit != 0) {
-//		std::cout << "SDL_Init error: " << SDL_GetError() << "\n";
-	//	return 1;//close the program
-	//}
+	auto sdlInit = SDL_Init(SDL_INIT_VIDEO);
+	if (sdlInit != 0) {
+		std::cout << "SDL_Init error: " << SDL_GetError() << "\n";
+		return 1;//close the program
+	}
 
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     //todo - why am i stuck using old gl?  Why would i need GLEW? or GLAD?  read up on the SDL2 instructions
-    //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
 
-    //SDL_Window* window = SDL_CreateWindow("Vulkan with SDL2",
-        //SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        //800, 600, SDL_WINDOW_VULKAN);
+    SDL_Window* window = SDL_CreateWindow("OpenGL with SDL2",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        800, 600, SDL_WINDOW_OPENGL);
 
-//    SDL_GLContext context = SDL_GL_CreateContext(window);
-  //  SDL_GL_MakeCurrent(window, context);
+    SDL_GLContext context = SDL_GL_CreateContext(window);
+    SDL_GL_MakeCurrent(window, context);
 
-//    bool guiRunning = true;
-  //  while (guiRunning) {
-    //    SDL_Event e;
-      //  while (SDL_PollEvent(&e)) {
-        //    if (e.type == SDL_QUIT) {
-          //      guiRunning = false;
-            //    break;
-//            }
-  //      }
+    bool guiRunning = true;
+    while (guiRunning) {
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                guiRunning = false;
+                break;
+            }
+        }
 
-    //    mySdlVisual->draw(window, context); // Handles glClear + drawing
-      //  SDL_GL_SwapWindow(window);          // Presents the frame
-        //SDL_Delay(16); // ~60 FPS
-    //}
+        mySdlVisual->draw(window, context); // Handles glClear + drawing
+        SDL_GL_SwapWindow(window);          // Presents the frame
+        SDL_Delay(16); // ~60 FPS
+    }
 
-	//station->event(mixr::base::IComponent::SHUTDOWN_EVENT);
-	//while (station->isNotShutdown()){
-		//mixr::base::msleep(10);
-	//}
-	//std::cout << "ready to close\n";
+	station->event(mixr::base::IComponent::SHUTDOWN_EVENT);
+	while (station->isNotShutdown()){
+		mixr::base::msleep(10);
+	}
+	std::cout << "ready to close\n";
 
-    while (1) {}
-    std::cout << "no loop no gui, we're done here because we never had anything to do\n";
+    
    return 0;
 }

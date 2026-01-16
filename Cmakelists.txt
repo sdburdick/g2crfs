@@ -17,6 +17,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/")
 # Use GLOB to collect files - 
 file(GLOB CRFS_CORE_SOURCES "${CMAKE_SOURCE_DIR}/core/src/*.cpp")
 file(GLOB CRFS_REMOTE_SOURCES "${CMAKE_SOURCE_DIR}/remote/src/*.cpp")
+file(GLOB CRFS_GUI_SOURCES "${CMAKE_SOURCE_DIR}/gui/src/*.cpp")
 
 
 
@@ -26,6 +27,7 @@ file(GLOB_RECURSE CORE_HEADERS    "${CMAKE_SOURCE_DIR}/core/include/*.h")
 
 file(GLOB_RECURSE COMMON_HEADERS    "${CMAKE_SOURCE_DIR}/common/include/*.h")
 
+file(GLOB_RECURSE CRFS_GUI_HEADERS    "${CMAKE_SOURCE_DIR}/gui/include/*.h")
                                
 
 
@@ -33,12 +35,10 @@ file(GLOB_RECURSE PROJECT_HEADERS "${CMAKE_SOURCE_DIR}/../mixr/include/*.h"
                                   "${CMAKE_SOURCE_DIR}/../shared/include/*.h"
                                   "${CMAKE_SOURCE_DIR}/core/include/*.h"
                                   "${CMAKE_SOURCE_DIR}/remote/include/*.h"
-                                  "${CMAKE_SOURCE_DIR}/gui/include/*.h")#currently not used in gen2
+                                  "${CMAKE_SOURCE_DIR}/gui/include/*.h")
 
 #newlibraryaction -- modify here if adding a library
-#example to pull in second library
-#file(GLOB CRFS_GUI_SOURCES "${CMAKE_SOURCE_DIR}/gui/src/*.cpp")
-#file(GLOB_RECURSE CRFS_GUI_HEADERS "${CMAKE_SOURCE_DIR}/gui/include/*.h")
+
 
 ##---Main Exe---##
 add_executable(CRFS "app/main.cpp")
@@ -47,13 +47,14 @@ add_executable(CRFS "app/main.cpp")
 add_library(core STATIC ${CRFS_CORE_SOURCES} ${CORE_HEADERS})
 add_library(remote STATIC ${CRFS_REMOTE_SOURCES} ${REMOTE_HEADERS})
 #newlibraryaction -- modify here if adding a library
-#add_library(gui STATIC ${CRFS_GUI_SOURCES} ${CRFS_GUI_HEADERS})
+add_library(gui STATIC ${CRFS_GUI_SOURCES} ${CRFS_GUI_HEADERS})
 
 ##---Include dir---##
 target_include_directories(core PRIVATE 
 	"${CMAKE_SOURCE_DIR}/core/include" 
 	"${CMAKE_SOURCE_DIR}/remote/include"
 	"${CMAKE_SOURCE_DIR}/common/include"
+	"${CMAKE_SOURCE_DIR}/gui/include"
 	#example if you need to access shared libraries within the 'core' library
 	"${CMAKE_SOURCE_DIR}/../shared/include"
 	"${CMAKE_SOURCE_DIR}/../mixr/include"
@@ -68,11 +69,11 @@ target_include_directories(remote PRIVATE
 )
 
 #newlibraryaction -- modify here if adding a library
-#target_include_directories(gui PRIVATE
-    #"${CMAKE_SOURCE_DIR}/gui/include"
-    #"${CMAKE_SOURCE_DIR}/../mixr/include"
-    #"${CMAKE_SOURCE_DIR}/../shared/SDL2-2.30.10/include"
-#)
+target_include_directories(gui PRIVATE
+    "${CMAKE_SOURCE_DIR}/gui/include"
+    "${CMAKE_SOURCE_DIR}/../mixr/include"
+    "${CMAKE_SOURCE_DIR}/../shared/SDL2-2.30.10/include"
+)
 
 
 ##---Include directories---##
@@ -83,6 +84,7 @@ target_include_directories(CRFS PRIVATE
     "${CMAKE_SOURCE_DIR}/core/include"
     "${CMAKE_SOURCE_DIR}/remote/include"
     "${CMAKE_SOURCE_DIR}/common/include"
+    "${CMAKE_SOURCE_DIR}/gui/include"
     #newlibraryaction -- modify here if adding a library
 )
 # Organize headers in VS Solution Explorer
@@ -101,7 +103,7 @@ if(MSVC)
 	target_compile_definitions(core PUBLIC $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>)
 	target_compile_definitions(remote PUBLIC $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>)
 	#newlibraryaction -- modify here if adding a library
-	#target_compile_definitions(gui PUBLIC $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>)
+	target_compile_definitions(gui PUBLIC $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>)
 	#project debug level 
 	target_compile_definitions(CRFS PRIVATE $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>)
 
@@ -111,6 +113,7 @@ if(MSVC)
 	#newlibraryaction -- modify here if adding a library
     set_property(TARGET core PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET remote PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET gui PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET CRFS PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 	
 	##---Visual Studio debugger settings---##
@@ -123,7 +126,7 @@ endif()
 # Link libraries depending on configuration
 target_link_libraries(CRFS PRIVATE
 	#newlibraryaction -- modify here if adding a library
-    #gui
+    gui
     core
     remote
     winmm.lib
@@ -194,7 +197,7 @@ include_external_msproject(mixr-simulation
     TYPE library
 )
 source_group("Common Headers" FILES ${COMMON_HEADERS})
-target_sources(CRFS PRIVATE ${COMMON_HEADERS})
+#target_sources(CRFS PRIVATE ${COMMON_HEADERS})
 target_include_directories(CRFS PRIVATE ${CMAKE_SOURCE_DIR}/common)
 
 
