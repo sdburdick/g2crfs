@@ -59,9 +59,14 @@ namespace mixr{
             glLineWidth(5.0f); // thick line
             glColor3f(1.0f, 0.0f, 0.0f); // red
 
+            static float delta = 0;
             // Draw a horizontal line across the screen
             glBegin(GL_LINES);
-            glVertex2f(100.0f, 300.0f); // start point
+            delta += 5.0;
+            glVertex2f(100.0f+delta, 300.0f+delta); // start point
+            if (delta > 250)
+            glVertex2f(700.0f-delta+250.0, 300.0f-delta+250.0); // end point
+            else
             glVertex2f(700.0f, 300.0f); // end point
             glEnd();
         }

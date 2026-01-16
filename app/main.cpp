@@ -226,8 +226,6 @@ int main(int argc, char* argv[])
     //todo
 
     auto mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>(station);
-    mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>(0);
-    mySdlVisual = station->findComponent<mixr::crfs::SdlVisual>();
     auto myInputDisplay = station->findComponent<mixr::graphics::Display>(station);
     
     // create time critical thread
@@ -278,10 +276,13 @@ int main(int argc, char* argv[])
                 break;
             }
         }
+        if (mySdlVisual != nullptr) {
+            mySdlVisual->draw(window, context); // Handles glClear + drawing
+        }
 
-        mySdlVisual->draw(window, context); // Handles glClear + drawing
         SDL_GL_SwapWindow(window);          // Presents the frame
-        SDL_Delay(16); // ~60 FPS
+        //SDL_Delay(16); // ~60 FPS
+        SDL_Delay(32); // 
     }
 
 	station->event(mixr::base::IComponent::SHUTDOWN_EVENT);
@@ -289,6 +290,7 @@ int main(int argc, char* argv[])
 		mixr::base::msleep(10);
 	}
 	std::cout << "ready to close\n";
+    station->unref();
 
     
    return 0;

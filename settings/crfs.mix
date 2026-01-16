@@ -52,11 +52,6 @@
 		}
 	)
 	components: {
-		display: (Display
-			name: "Input Created Display"
-			vpWidth: 400
-			vpHeight: 400
-		)
 		mySdlVisual: (SdlVisual)
 	}
 )
